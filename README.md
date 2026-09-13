@@ -10,14 +10,28 @@ The first version of CHAOS begins with something simple:
 
 **observing the computer it is running on.**
 
-The current Python module uses `psutil` to collect basic CPU information:
+The current Python modules use `psutil` to collect information about the computer's hardware and system resources.
+
+### Current Systems
+
+**CPU Observation**
 
 * CPU usage
 * CPU frequency
 * Physical CPU cores
 * Logical CPU cores
 
-The collected information is organized into a Python dictionary and displayed as structured data.
+**Disk Observation**
+
+* Disk device
+* Mount point
+* Filesystem
+* Total storage
+* Used storage
+* Free storage
+* Storage usage percentage
+
+The collected information is organized into Python data structures and displayed as structured data.
 
 ## Example
 
@@ -30,18 +44,30 @@ cpu = {
 }
 ```
 
-This is the first observation system of CHAOS.
+This is the beginning of the observation system of CHAOS.
 
 ## Technologies
 
 * Python
 * psutil
 
+## Project Structure
+
+```text
+PROJECT 001 CHAOS/
+│
+├── Core/
+│   ├── cpu.py
+│   └── disk.py
+│
+└── README.md
+```
+
 ## Project Status
 
 🚧 Early development
 
 **Version:** V0.1
-**Current system:** CPU Observation
+**Current systems:** CPU Observation + Disk Observation
 
 This project will evolve gradually as new observation and experimental systems are developed.
