@@ -13,5 +13,3 @@ cpu = {
     "physical_cores": physical_cores,
     "logical_cores": logical_cores
 }
-
-print(cpu)
