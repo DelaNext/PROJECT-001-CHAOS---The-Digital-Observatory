@@ -4,9 +4,9 @@ The beginning of my personal laboratory.
 
 CHAOS is a long-term project focused on observation, computation, experimentation, and the development of systems that can understand and interact with the world around them.
 
-## Current Stage — V0.1
+## Current Stage — V0.2
 
-The first version of CHAOS begins with something simple:
+The first stage of CHAOS begins with something simple:
 
 **observing the computer it is running on.**
 
@@ -31,6 +31,26 @@ The current Python modules use `psutil` to collect information about the compute
 * Free storage
 * Storage usage percentage
 
+**Memory Observation**
+
+* Total RAM
+* Available RAM
+* Used RAM
+* RAM usage percentage
+* Total swap memory
+* Used swap memory
+* Swap usage percentage
+
+**System Observation**
+
+* Operating system
+* System node
+* System release
+* Machine architecture
+* Python version
+* Boot time
+* System uptime
+
 The collected information is organized into Python data structures and displayed as structured data.
 
 ## Example
@@ -44,12 +64,14 @@ cpu = {
 }
 ```
 
-This is the beginning of the observation system of CHAOS.
+This is the foundation of the observation system of CHAOS.
 
 ## Technologies
 
 * Python
 * psutil
+* platform
+* time
 
 ## Project Structure
 
@@ -58,7 +80,9 @@ PROJECT 001 CHAOS/
 │
 ├── Core/
 │   ├── cpu.py
-│   └── disk.py
+│   ├── disk.py
+│   ├── memory.py
+│   └── system.py
 │
 └── README.md
 ```
@@ -67,7 +91,10 @@ PROJECT 001 CHAOS/
 
 🚧 Early development
 
-**Version:** V0.1
-**Current systems:** CPU Observation + Disk Observation
+**Version:** V0.2
 
-This project will evolve gradually as new observation and experimental systems are developed.
+**Core systems:** CPU Observation + Disk Observation + Memory Observation + System Observation
+
+The Core observation stage is complete.
+
+CHAOS will evolve gradually as new observation, experimentation, and computational systems are developed.
