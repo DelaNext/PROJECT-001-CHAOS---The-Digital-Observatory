@@ -61,7 +61,15 @@ def get_cpu_usage(start=None, end=None, limit=None):
     usage = cursor.fetchall()
 
     conn.close()
-    return usage   
+    return usage
+
+def calculate_average(observations):
+    total = 0
+
+    for observation in observations:
+        total += observation[1]
+
+    return total / len(observations)
 
 if __name__ == "__main__":
     init_db()
@@ -69,10 +77,13 @@ if __name__ == "__main__":
 
     observations = get_cpu_usage(limit=5)
 
-    for observation in observations:
-        print(observation)
+    average = calculate_average(observations)
+    print("Average CPU usage:", average)
 
-    schedule.every(5).seconds.do(store_cpu_data)
+    for observation in observations:
+     print(observation)
+
+    schedule.every(10).minutes.do(store_cpu_data)
 
     print("Scheduler running. Press Ctrl+C to stop.")
     while True:
