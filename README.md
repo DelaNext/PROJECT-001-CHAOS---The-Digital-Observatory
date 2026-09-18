@@ -4,7 +4,7 @@ The beginning of my personal laboratory.
 
 CHAOS is a long-term project focused on observation, computation, experimentation, and the development of systems that can understand and interact with the world around them.
 
-## Current Stage — V0.3
+## Current Stage — V0.4
 
 The first stage of CHAOS began with something simple:
 
@@ -12,11 +12,17 @@ The first stage of CHAOS began with something simple:
 
 The current Python modules use `psutil` to collect information about the computer's hardware and system resources.
 
-Now, CHAOS has taken its next step:
+CHAOS then took its next step:
 
 **organizing and storing the information it observes.**
 
 The collected data is passed from the Core observation modules to the Data layer, where it can be stored persistently using SQLite.
+
+Now, CHAOS has taken another step:
+
+**retrieving and analyzing the information it has stored.**
+
+CPU observations can now be collected continuously, stored in the database, retrieved according to specific conditions, and analyzed to extract basic information from historical observations.
 
 ### Current Systems
 
@@ -26,6 +32,8 @@ The collected data is passed from the Core observation modules to the Data layer
 * CPU frequency
 * Physical CPU cores
 * Logical CPU cores
+
+The CPU observation system now uses a function that collects fresh CPU information whenever it is called, allowing CHAOS to observe the computer dynamically rather than relying on values collected only when the module starts.
 
 **Disk Observation**
 
@@ -59,13 +67,15 @@ The collected data is passed from the Core observation modules to the Data layer
 
 ### Data System
 
-The Data layer is responsible for receiving and storing information collected by CHAOS.
+The Data layer is responsible for receiving, organizing, storing, and retrieving information collected by CHAOS.
 
 Currently, it uses:
 
 * Python dictionaries for structured data
 * SQLite for persistent storage
 * SQL tables for organizing collected information
+* SQL queries for retrieving stored observations
+* Parameterized queries for dynamic filtering
 
 The current data flow is:
 
@@ -76,17 +86,91 @@ Core
  ├── Disk
  ├── Memory
  └── System
-       │
-       ▼
-     Data
-       │
-       ▼
-    SQLite
+        │
+        ▼
+      Data
+        │
+        ▼
+     SQLite
+        │
+        ▼
+   Retrieval
+        │
+        ▼
+    Analysis
 ```
 
-This allows CHAOS to move from simply observing the computer to **recording what it observes**.
+CHAOS can now store CPU observations with information such as:
+
+* CPU usage
+* CPU frequency
+* Physical CPU cores
+* Logical CPU cores
+* Timestamp of the observation
+
+The database layer can retrieve observations using different parameters, including:
+
+* Start time
+* End time
+* Number of observations
+
+This allows CHAOS to move beyond simply recording what it observes.
+
+It can now **retrieve historical observations and begin extracting information from them.**
+
+### Continuous Observation
+
+CHAOS now includes a scheduler that can automatically collect CPU observations at regular intervals.
+
+The current observation interval is:
+
+```text
+10 minutes
+```
+
+This creates a growing historical record of CPU activity over time.
+
+The scheduler can be stopped manually using `Ctrl+C`.
+
+### Data Analysis
+
+CHAOS has begun its first basic analysis operation.
+
+The current analysis system can calculate the average CPU usage of a collection of retrieved observations.
+
+For example, if CHAOS retrieves five observations:
+
+```text
+22.8%
+13.5%
+35.9%
+44.0%
+21.8%
+```
+
+It can calculate:
+
+```text
+Average CPU usage: 27.6%
+```
+
+This represents the beginning of the transition from:
+
+```text
+Observation → Storage → Retrieval → Analysis
+```
+
+Instead of only asking:
+
+**"What happened?"**
+
+CHAOS can begin asking:
+
+**"What can I learn from what happened?"**
 
 ## Example
+
+A CPU observation is represented as structured data:
 
 ```python
 cpu_dictionary = {
@@ -97,9 +181,21 @@ cpu_dictionary = {
 }
 ```
 
-The dictionary can then be passed to the Data layer and stored in the SQLite database.
+The dictionary can be passed to the Data layer and stored in the SQLite database.
 
-This is the beginning of the data foundation of CHAOS.
+Stored observations can later be retrieved:
+
+```python
+observations = get_cpu_usage(limit=5)
+```
+
+And analyzed:
+
+```python
+average = calculate_average(observations)
+```
+
+This creates the beginning of an analytical foundation for CHAOS.
 
 ## Technologies
 
@@ -107,13 +203,15 @@ This is the beginning of the data foundation of CHAOS.
 * psutil
 * SQLite
 * sqlite3
+* schedule
 * platform
 * time
 
 ## Project Structure
 
 ```text
-PROJECT 001 CHAOS/
+PROJECT-001-CHAOS/
+
 │
 ├── Core/
 │   ├── __init__.py
@@ -138,14 +236,20 @@ PROJECT 001 CHAOS/
 
 🚧 Early development
 
-**Version:** V0.3
+**Version:** V0.4
 
 **Core systems:** CPU Observation + Disk Observation + Memory Observation + System Observation
 
-**Data systems:** Data organization + SQLite storage
+**Data systems:** Data organization + SQLite storage + Historical retrieval
+
+**Analysis systems:** Basic CPU usage analysis
+
+**Automation:** Continuous CPU observation with scheduled data collection
 
 The Core observation stage is complete.
 
-The Data stage is currently under development.
+The Data stage has progressed from basic storage to historical retrieval.
+
+The Analysis stage has now begun.
 
 CHAOS will evolve gradually as new observation, data, experimentation, and computational systems are developed.
