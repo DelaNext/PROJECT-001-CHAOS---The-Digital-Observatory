@@ -4,25 +4,29 @@ The beginning of my personal laboratory.
 
 CHAOS is a long-term project focused on observation, computation, experimentation, and the development of systems that can understand and interact with the world around them.
 
-## Current Stage — V0.4
+## Current Stage — V0.7
 
 The first stage of CHAOS began with something simple:
 
 **observing the computer it is running on.**
 
-The current Python modules use `psutil` to collect information about the computer's hardware and system resources.
+CHAOS then evolved from simply observing information to **organizing and storing what it observes**.
 
-CHAOS then took its next step:
+The next step was **retrieving and analyzing historical observations**.
 
-**organizing and storing the information it observes.**
+CHAOS has now taken another major step:
 
-The collected data is passed from the Core observation modules to the Data layer, where it can be stored persistently using SQLite.
+**integrating its observation systems into a single Digital Observatory capable of detecting events in the environment it observes.**
 
-Now, CHAOS has taken another step:
+The project has expanded from individual observation modules into a system where multiple sources of information can be collected, combined, stored, analyzed, and interpreted through deterministic rules.
 
-**retrieving and analyzing the information it has stored.**
+The current conceptual flow is:
 
-CPU observations can now be collected continuously, stored in the database, retrieved according to specific conditions, and analyzed to extract basic information from historical observations.
+```text
+Observe → Store → Retrieve → Analyze → Detect
+```
+
+This is the foundation upon which future CHAOS systems will be built.
 
 ### Current Systems
 
@@ -33,7 +37,23 @@ CPU observations can now be collected continuously, stored in the database, retr
 * Physical CPU cores
 * Logical CPU cores
 
-The CPU observation system now uses a function that collects fresh CPU information whenever it is called, allowing CHAOS to observe the computer dynamically rather than relying on values collected only when the module starts.
+The CPU observation system uses a function that collects fresh CPU information whenever it is called, allowing CHAOS to observe the computer dynamically.
+
+**GPU Observation**
+
+CHAOS can now observe AMD GPU information through AMD ADLX.
+
+Current GPU observations include:
+
+* GPU name
+* GPU usage
+* GPU temperature
+* GPU clock speed
+* VRAM usage
+* GPU power consumption
+* GPU fan speed
+
+This allows CHAOS to observe not only the general computer system, but also the dedicated graphics processor.
 
 **Disk Observation**
 
@@ -44,6 +64,8 @@ The CPU observation system now uses a function that collects fresh CPU informati
 * Used storage
 * Free storage
 * Storage usage percentage
+
+CHAOS can observe multiple storage devices and evaluate their current state.
 
 **Memory Observation**
 
@@ -65,7 +87,37 @@ The CPU observation system now uses a function that collects fresh CPU informati
 * Boot time
 * System uptime
 
-### Data System
+**Process Observation**
+
+CHAOS can now observe currently running processes.
+
+Process observations include:
+
+* Process ID
+* Process name
+* Process status
+* CPU usage
+* Memory usage
+
+This allows CHAOS to observe not only the hardware itself, but also what is actively running on the system.
+
+**Network Observation**
+
+CHAOS can observe the computer's network interfaces and their current state.
+
+Current network observations include:
+
+* Interface name
+* Network addresses
+* Address family
+* Bytes sent
+* Bytes received
+* Packets sent
+* Packets received
+
+This extends CHAOS's observation capabilities beyond the local hardware and into the communication layer of the system.
+
+## Data System
 
 The Data layer is responsible for receiving, organizing, storing, and retrieving information collected by CHAOS.
 
@@ -76,69 +128,137 @@ Currently, it uses:
 * SQL tables for organizing collected information
 * SQL queries for retrieving stored observations
 * Parameterized queries for dynamic filtering
+* JSON serialization for storing complete observations
+
+CHAOS can now store a complete observation containing information from multiple observation systems.
 
 The current data flow is:
 
 ```text
-Core
- │
- ├── CPU
- ├── Disk
- ├── Memory
- └── System
+                    CHAOS
+                      │
+                      ▼
+                  Observation
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+       Core        Processes      Network
         │
-        ▼
-      Data
-        │
-        ▼
-     SQLite
-        │
-        ▼
-   Retrieval
-        │
-        ▼
-    Analysis
+        ├── CPU
+        ├── GPU
+        ├── Disk
+        ├── Memory
+        └── System
+                      │
+                      ▼
+                    Data
+                      │
+                      ▼
+                   SQLite
+                      │
+                      ▼
+                 Historical Data
 ```
 
-CHAOS can now store CPU observations with information such as:
+Previously, CHAOS primarily stored CPU observations.
 
-* CPU usage
-* CPU frequency
-* Physical CPU cores
-* Logical CPU cores
-* Timestamp of the observation
+It can now store a broader representation of the state of the computer.
 
-The database layer can retrieve observations using different parameters, including:
-
-* Start time
-* End time
-* Number of observations
-
-This allows CHAOS to move beyond simply recording what it observes.
-
-It can now **retrieve historical observations and begin extracting information from them.**
-
-### Continuous Observation
-
-CHAOS now includes a scheduler that can automatically collect CPU observations at regular intervals.
-
-The current observation interval is:
+This represents an important transition from:
 
 ```text
-10 minutes
+Individual Observation
 ```
 
-This creates a growing historical record of CPU activity over time.
+to:
 
-The scheduler can be stopped manually using `Ctrl+C`.
+```text
+Complete System Observation
+```
 
-### Data Analysis
+## CHAOS Orchestrator
 
-CHAOS has begun its first basic analysis operation.
+The `CHAOS` layer now acts as the central orchestration layer for the observatory.
 
-The current analysis system can calculate the average CPU usage of a collection of retrieved observations.
+The `observe()` function collects information from the different observation systems and combines them into a single observation.
 
-For example, if CHAOS retrieves five observations:
+Conceptually:
+
+```text
+CPU ───────┐
+GPU ───────┤
+Disk ──────┤
+Memory ────┤
+System ────┤
+Processes ─┤──→ CHAOS.observe()
+Network ───┘          │
+                      ▼
+                Complete Observation
+```
+
+This allows CHAOS to operate as a single system rather than as a collection of unrelated modules.
+
+## Event Detection
+
+CHAOS has now begun detecting events from its observations.
+
+The first event detector monitors disk usage.
+
+When a disk reaches or exceeds the configured threshold, CHAOS generates an event.
+
+For example:
+
+```text
+C:\ → 92.0% usage
+        │
+        ▼
+   Threshold: 90%
+        │
+        ▼
+   Event detected
+```
+
+The resulting event contains:
+
+* Event type
+* Event source
+* Human-readable message
+* Relevant observation data
+
+Example:
+
+```python
+{
+    "type": "disk_high_usage",
+    "source": "Disk",
+    "message": "C:\\ is using 92.0% of its capacity.",
+    "data": {...}
+}
+```
+
+This represents the beginning of a transition from:
+
+```text
+Observation → Storage
+```
+
+toward:
+
+```text
+Observation → Analysis → Detection
+```
+
+CHAOS is no longer only recording what exists.
+
+It has begun recognizing when something important happens.
+
+## Data Analysis
+
+CHAOS has begun its first basic analysis operations.
+
+The current data system can calculate the average CPU usage of a collection of historical observations.
+
+For example:
 
 ```text
 22.8%
@@ -148,54 +268,80 @@ For example, if CHAOS retrieves five observations:
 21.8%
 ```
 
-It can calculate:
+can produce:
 
 ```text
 Average CPU usage: 27.6%
 ```
 
-This represents the beginning of the transition from:
+This represents the beginning of the analytical foundation of CHAOS.
+
+The long-term goal is to expand analysis beyond simple averages into:
+
+* Trends
+* Threshold detection
+* Anomaly detection
+* Historical comparisons
+* Correlations
+* Pattern recognition
+
+These systems will initially be deterministic and computational rather than AI-driven.
+
+## Continuous Observation
+
+CHAOS includes a scheduler capable of collecting CPU observations at regular intervals.
+
+The current CPU observation interval is:
 
 ```text
-Observation → Storage → Retrieval → Analysis
+10 minutes
 ```
 
-Instead of only asking:
+This creates a growing historical record of CPU activity.
 
-**"What happened?"**
+Continuous observation will eventually be expanded to the complete CHAOS observation cycle.
 
-CHAOS can begin asking:
+## Current Architecture
 
-**"What can I learn from what happened?"**
+The current architecture is:
 
-## Example
+```text
+PROJECT-001-CHAOS/
 
-A CPU observation is represented as structured data:
-
-```python
-cpu_dictionary = {
-    "usage": usage,
-    "frequency": freq.current,
-    "physical_cores": physical_cores,
-    "logical_cores": logical_cores
-}
+├── Core/
+│   ├── __init__.py
+│   ├── cpu.py
+│   ├── disk.py
+│   ├── memory.py
+│   ├── system.py
+│   └── gpu.py
+│
+├── Data/
+│   ├── __init__.py
+│   ├── data.py
+│   └── database.py
+│
+├── Events/
+│   ├── __init__.py
+│   └── events.py
+│
+├── Network/
+│   ├── __init__.py
+│   └── network.py
+│
+├── Processes/
+│   ├── __init__.py
+│   └── processes.py
+│
+├── CHAOS/
+│   ├── __init__.py
+│   └── chaos.py
+│
+├── .gitignore
+└── README.md
 ```
 
-The dictionary can be passed to the Data layer and stored in the SQLite database.
-
-Stored observations can later be retrieved:
-
-```python
-observations = get_cpu_usage(limit=5)
-```
-
-And analyzed:
-
-```python
-average = calculate_average(observations)
-```
-
-This creates the beginning of an analytical foundation for CHAOS.
+Runtime data such as `data.db` and Python-generated cache files are excluded from the source repository.
 
 ## Technologies
 
@@ -206,50 +352,33 @@ This creates the beginning of an analytical foundation for CHAOS.
 * schedule
 * platform
 * time
+* JSON
+* AMD ADLX
 
-## Project Structure
+## Current Conceptual Model
+
+CHAOS is gradually being built around the following loop:
 
 ```text
-PROJECT-001-CHAOS/
-
-│
-├── Core/
-│   ├── __init__.py
-│   ├── cpu.py
-│   ├── disk.py
-│   ├── memory.py
-│   └── system.py
-│
-├── Data/
-│   ├── __init__.py
-│   ├── data.py
-│   └── database.py
-│
-├── data.db
-│
-└── README.md
+Observe
+   ↓
+Store
+   ↓
+Retrieve
+   ↓
+Analyze
+   ↓
+Detect
+   ↓
+Improve
+   ↓
+Observe Again
 ```
 
-> `data.db` contains local runtime data generated by CHAOS and is not part of the source code.
+The current system is still deterministic.
 
-## Project Status
+It does not yet attempt to understand the world through artificial intelligence.
 
-🚧 Early development
+Instead, the objective is to first build a real observatory capable of collecting reliable information and developing a history of what it observes.
 
-**Version:** V0.4
-
-**Core systems:** CPU Observation + Disk Observation + Memory Observation + System Observation
-
-**Data systems:** Data organization + SQLite storage + Historical retrieval
-
-**Analysis systems:** Basic CPU usage analysis
-
-**Automation:** Continuous CPU observation with scheduled data collection
-
-The Core observation stage is complete.
-
-The Data stage has progressed from basic storage to historical retrieval.
-
-The Analysis stage has now begun.
-
-CHAOS will evolve gradually as new observation, data, experimentation, and computational systems are developed.
+AI and more advanced reasoning
