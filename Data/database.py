@@ -3,6 +3,8 @@ import schedule
 import time
 from datetime import datetime
 from Core.cpu import get_cpu
+import json
+
 
 DB_PATH = 'data.db'
 
@@ -18,6 +20,29 @@ def init_db():
         created_at TIMESTAMP
     )''')
     conn.commit()
+    conn.close()
+
+def store_observation(observation):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    conn =sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS observations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        created_at TIMESTAMP,
+        data TEXT
+    )''')
+
+    data = json.dumps(observation)
+
+    cursor.execute(
+        "INSERT INTO observations (created_at, data) VALUES (?, ?)",
+        (timestamp, data)
+    )
+
+    conn.commit()
+
     conn.close()
 
 def store_cpu_data():
