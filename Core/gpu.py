@@ -1,43 +1,43 @@
-from adlx import ADLX  # Imports AMD's ADLX library so Python can communicate with the GPU.
+from adlx import ADLX
 
 
-def get_gpu():  # Defines the function that collects information about the GPU.
-    helper = ADLX.ADLXHelper()  # Creates the ADLX helper used to communicate with AMD hardware.
-    result = helper.Initialize()  # Initializes ADLX.
+def get_gpu():
+    helper = ADLX.ADLXHelper()
+    result = helper.Initialize()
 
-    if result != ADLX.ADLX_RESULT.ADLX_OK:  # Checks whether ADLX initialized successfully.
-        raise RuntimeError(f"ADLX initialization failed: {result}")  # Stops the program if initialization failed.
+    if result != ADLX.ADLX_RESULT.ADLX_OK:
+        raise RuntimeError(f"ADLX initialization failed: {result}")
 
-    system = helper.GetSystemServices()  # Gets ADLX system services.
-    gpus = system.GetGPUs()  # Gets the GPUs detected by the computer.
-    monitoring = system.GetPerformanceMonitoringServices()  # Gets the GPU performance-monitoring service.
+    system = helper.GetSystemServices()
+    gpus = system.GetGPUs()
+    monitoring = system.GetPerformanceMonitoringServices()
 
-    GPU = []  # Creates a list to store information about all detected GPUs.
+    GPU = []
 
-    for gpu in gpus:  # Goes through every GPU detected by the system.
-        metrics = monitoring.GetCurrentGPUMetrics(gpu)  # Gets the current performance measurements for this GPU.
+    for gpu in gpus:
+        metrics = monitoring.GetCurrentGPUMetrics(gpu)
 
-        GPU.append({  # Adds this GPU's information to our result list.
-            "name": gpu.Name(),  # Gets the GPU's name.
-            "usage": metrics.GPUUsage(),  # Gets current GPU utilization as a percentage.
-            "temperature": metrics.GPUTemperature(),  # Gets current GPU temperature in Celsius.
-            "clock": metrics.GPUClockSpeed(),  # Gets current GPU clock speed in MHz.
-            "vram": metrics.GPUVRAM(),  # Gets current VRAM usage in MB.
-            "power": metrics.GPUPower(),  # Gets current GPU power consumption in watts.
-            "fan": metrics.GPUFanSpeed()  # Gets current GPU fan speed in RPM.
+        GPU.append({
+            "name": gpu.Name(),
+            "usage": metrics.GPUUsage(),
+            "temperature": metrics.GPUTemperature(),
+            "clock": metrics.GPUClockSpeed(),
+            "vram": metrics.GPUVRAM(),
+            "power": metrics.GPUPower(),
+            "fan": metrics.GPUFanSpeed()
         })
 
-        del metrics  # Releases the metrics interface before ADLX is terminated.
+        del metrics
 
-    del monitoring  # Releases the performance-monitoring interface.
-    del gpu  # Releases the GPU interface.
-    del gpus  # Releases the GPU collection.
-    del system  # Releases the system interface.
+    del monitoring
+    del gpu
+    del gpus
+    del system
 
-    helper.Terminate()  # Terminates ADLX after all interfaces have been released.
-    del helper  # Releases the ADLX helper.
+    helper.Terminate()
+    del helper
 
-    return GPU  # Returns the collected GPU information.
+    return GPU
 
 
-print(get_gpu())  # Runs the GPU observation and prints the result.
+print(get_gpu())
